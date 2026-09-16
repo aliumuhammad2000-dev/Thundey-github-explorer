@@ -1,6 +1,11 @@
-import { Code2, Search } from 'lucide-react'
+import { Code2 } from 'lucide-react'
+import SearchForm from './components/SearchForm'
 
 function App() {
+  function handleSearch({ query, type }) {
+    console.log(`Ready to search ${type}: ${query}`)
+  }
+
   return (
     <main className="dark min-h-screen bg-[#0b1020] px-6 py-10 text-[#eef2ff] sm:px-10">
       <div className="mx-auto max-w-5xl">
@@ -12,8 +17,7 @@ function App() {
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[#4f46e5] dark:text-[#f59e0b]">Explore the developer community</p>
           <h1 className="mx-auto mt-4 max-w-3xl text-4xl font-bold tracking-tight text-[#eef2ff] sm:text-6xl">Find developers and projects worth discovering.</h1>
           <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-[#64748b] dark:text-[#a8b5d8] sm:text-lg">Search GitHub users and repositories, then explore real profiles, code, and open-source work through the GitHub REST API.</p>
-          <div className="mx-auto mt-10 flex max-w-2xl flex-col gap-3 sm:flex-row">
-            <label className="relative flex-1"><span className="sr-only">Search GitHub</span><Search aria-hidden="true" className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94a3b8] dark:text-[#7182ae]" size={20} /><input className="w-full rounded-xl border border-[#dce3f4] bg-white py-4 pl-12 pr-4 text-[#172554] outline-none placeholder:text-[#94a3b8] focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 dark:border-[#2d3a5c] dark:bg-[#161d33] dark:text-[#eef2ff] dark:placeholder:text-[#7182ae] dark:focus:border-[#f59e0b]" placeholder="Search GitHub users or repositories" type="search" /></label><button className="rounded-xl bg-[#4f46e5] px-6 py-4 font-semibold text-white transition hover:bg-[#3730a3] dark:bg-[#f59e0b] dark:text-[#172554] dark:hover:bg-[#fbbf24]" type="button">Search</button></div>
+          <SearchForm onSearch={handleSearch} />
         </section>
       </div>
     </main>
