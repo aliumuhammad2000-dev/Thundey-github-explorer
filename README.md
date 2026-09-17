@@ -34,7 +34,7 @@ The app reads public data from GitHub’s REST API. Search requests are made dir
 
 ## Live Demo
 
-
+[Open the thundey-github-explorer application](https://thundey-github-explorer.vercel.app/)
 
 ## Project Structure
 
@@ -46,4 +46,6 @@ src/
 ├── App.jsx              # Main application state and layout
 └── main.jsx             # React entry point
 ```
+
+
 
