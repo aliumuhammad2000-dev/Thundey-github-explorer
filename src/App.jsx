@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { getUser, searchRepositories, searchUsers } from './api/github'
 import SearchForm from './components/SearchForm'
 import RepositoryResultCard from './components/RepositoryResultCard'
+import ResultsToolbar from './components/ResultsToolbar'
 import UserResultCard from './components/UserResultCard'
 import UserProfile from './components/UserProfile'
 
@@ -12,6 +13,7 @@ function App() {
   const [error, setError] = useState('')
   const [hasSearched, setHasSearched] = useState(false)
   const [searchType, setSearchType] = useState('users')
+  const [sortBy, setSortBy] = useState('stars')
   const [lastQuery, setLastQuery] = useState('')
   const [page, setPage] = useState(1)
   const [profile, setProfile] = useState(null)
@@ -20,6 +22,7 @@ function App() {
 
   async function handleSearch({ query, type }) {
     setSearchType(type)
+    setSortBy('stars')
     setLastQuery(query)
     setPage(1)
     setLoading(true)
@@ -38,6 +41,13 @@ function App() {
       setLoading(false)
     }
   }
+
+  const sortedResults = [...results].sort((first, second) => {
+    if (searchType === 'users') return 0
+    if (sortBy === 'forks') return second.forks_count - first.forks_count
+    if (sortBy === 'updated') return new Date(second.updated_at) - new Date(first.updated_at)
+    return second.stargazers_count - first.stargazers_count
+  })
 
   async function handlePageChange(nextPage) {
     if (!lastQuery || nextPage < 1) return
@@ -91,10 +101,11 @@ function App() {
           {!profile && !profileLoading && hasSearched && (
             <section className="mx-auto mt-16 max-w-5xl text-left">
               <div className="mb-5 flex items-center justify-between"><h2 className="text-xl font-semibold text-[#eef2ff]">Search results</h2>{!loading && !error && <p className="text-sm text-[#a8b5d8]">{results.length} found</p>}</div>
+              <ResultsToolbar onSortChange={setSortBy} searchType={searchType} sortBy={sortBy} />
               {loading && <p className="text-[#f59e0b]">Searching GitHub...</p>}
               {error && <p className="text-rose-300" role="alert">{error}</p>}
               {!loading && !error && results.length === 0 && <p className="text-[#a8b5d8]">No results found. Try another search.</p>}
-              {!loading && !error && results.length > 0 && <><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{results.map((result) => searchType === 'users' ? <UserResultCard key={result.id} onView={handleViewProfile} user={result} /> : <RepositoryResultCard key={result.id} repository={result} />)}</div><div className="mt-8 flex items-center justify-center gap-4"><button aria-label="Previous page" className="inline-flex items-center gap-2 rounded-lg border border-[#2d3a5c] px-3 py-2 text-sm text-[#a8b5d8] transition hover:border-[#f59e0b] hover:text-[#f59e0b] disabled:cursor-not-allowed disabled:opacity-40" disabled={page === 1} onClick={() => handlePageChange(page - 1)} type="button"><ChevronLeft size={16} />Previous</button><span className="text-sm text-[#a8b5d8]">Page {page}</span><button aria-label="Next page" className="inline-flex items-center gap-2 rounded-lg border border-[#2d3a5c] px-3 py-2 text-sm text-[#a8b5d8] transition hover:border-[#f59e0b] hover:text-[#f59e0b] disabled:cursor-not-allowed disabled:opacity-40" disabled={results.length < 12} onClick={() => handlePageChange(page + 1)} type="button">Next<ChevronRight size={16} /></button></div></>}
+              {!loading && !error && results.length > 0 && <><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{sortedResults.map((result) => searchType === 'users' ? <UserResultCard key={result.id} onView={handleViewProfile} user={result} /> : <RepositoryResultCard key={result.id} repository={result} />)}</div><div className="mt-8 flex items-center justify-center gap-4"><button aria-label="Previous page" className="inline-flex items-center gap-2 rounded-lg border border-[#2d3a5c] px-3 py-2 text-sm text-[#a8b5d8] transition hover:border-[#f59e0b] hover:text-[#f59e0b] disabled:cursor-not-allowed disabled:opacity-40" disabled={page === 1} onClick={() => handlePageChange(page - 1)} type="button"><ChevronLeft size={16} />Previous</button><span className="text-sm text-[#a8b5d8]">Page {page}</span><button aria-label="Next page" className="inline-flex items-center gap-2 rounded-lg border border-[#2d3a5c] px-3 py-2 text-sm text-[#a8b5d8] transition hover:border-[#f59e0b] hover:text-[#f59e0b] disabled:cursor-not-allowed disabled:opacity-40" disabled={results.length < 12} onClick={() => handlePageChange(page + 1)} type="button">Next<ChevronRight size={16} /></button></div></>}
             </section>
           )}
         </section>
