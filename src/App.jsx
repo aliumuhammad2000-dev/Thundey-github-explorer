@@ -1,4 +1,4 @@
-import { Code2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Code2 } from 'lucide-react'
 import { useState } from 'react'
 import { getUser, searchRepositories, searchUsers } from './api/github'
 import SearchForm from './components/SearchForm'
@@ -12,12 +12,16 @@ function App() {
   const [error, setError] = useState('')
   const [hasSearched, setHasSearched] = useState(false)
   const [searchType, setSearchType] = useState('users')
+  const [lastQuery, setLastQuery] = useState('')
+  const [page, setPage] = useState(1)
   const [profile, setProfile] = useState(null)
   const [profileLoading, setProfileLoading] = useState(false)
   const [profileError, setProfileError] = useState('')
 
   async function handleSearch({ query, type }) {
     setSearchType(type)
+    setLastQuery(query)
+    setPage(1)
     setLoading(true)
     setError('')
     setHasSearched(true)
@@ -29,6 +33,21 @@ function App() {
       setResults(items)
     } catch (requestError) {
       setResults([])
+      setError(requestError.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handlePageChange(nextPage) {
+    if (!lastQuery || nextPage < 1) return
+    setPage(nextPage)
+    setLoading(true)
+    setError('')
+    try {
+      const items = searchType === 'users' ? await searchUsers(lastQuery, nextPage) : await searchRepositories(lastQuery, nextPage)
+      setResults(items)
+    } catch (requestError) {
       setError(requestError.message)
     } finally {
       setLoading(false)
@@ -75,7 +94,7 @@ function App() {
               {loading && <p className="text-[#f59e0b]">Searching GitHub...</p>}
               {error && <p className="text-rose-300" role="alert">{error}</p>}
               {!loading && !error && results.length === 0 && <p className="text-[#a8b5d8]">No results found. Try another search.</p>}
-              {!loading && !error && results.length > 0 && <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{results.map((result) => searchType === 'users' ? <UserResultCard key={result.id} onView={handleViewProfile} user={result} /> : <RepositoryResultCard key={result.id} repository={result} />)}</div>}
+              {!loading && !error && results.length > 0 && <><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{results.map((result) => searchType === 'users' ? <UserResultCard key={result.id} onView={handleViewProfile} user={result} /> : <RepositoryResultCard key={result.id} repository={result} />)}</div><div className="mt-8 flex items-center justify-center gap-4"><button aria-label="Previous page" className="inline-flex items-center gap-2 rounded-lg border border-[#2d3a5c] px-3 py-2 text-sm text-[#a8b5d8] transition hover:border-[#f59e0b] hover:text-[#f59e0b] disabled:cursor-not-allowed disabled:opacity-40" disabled={page === 1} onClick={() => handlePageChange(page - 1)} type="button"><ChevronLeft size={16} />Previous</button><span className="text-sm text-[#a8b5d8]">Page {page}</span><button aria-label="Next page" className="inline-flex items-center gap-2 rounded-lg border border-[#2d3a5c] px-3 py-2 text-sm text-[#a8b5d8] transition hover:border-[#f59e0b] hover:text-[#f59e0b] disabled:cursor-not-allowed disabled:opacity-40" disabled={results.length < 12} onClick={() => handlePageChange(page + 1)} type="button">Next<ChevronRight size={16} /></button></div></>}
             </section>
           )}
         </section>
