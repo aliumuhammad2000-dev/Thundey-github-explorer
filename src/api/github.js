@@ -19,3 +19,9 @@ export async function getUser(username) {
   if (!response.ok) throw new Error('Unable to load this GitHub profile.')
   return response.json()
 }
+
+export async function getUserRepositories(username) {
+  const response = await fetch(`${GITHUB_API}/users/${encodeURIComponent(username)}/repos?sort=updated&per_page=12`)
+  if (!response.ok) throw new Error('Unable to load this user repositories.')
+  return response.json()
+}
