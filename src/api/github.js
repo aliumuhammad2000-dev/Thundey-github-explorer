@@ -13,3 +13,9 @@ export async function searchRepositories(query) {
   const data = await response.json()
   return data.items
 }
+
+export async function getUser(username) {
+  const response = await fetch(`${GITHUB_API}/users/${encodeURIComponent(username)}`)
+  if (!response.ok) throw new Error('Unable to load this GitHub profile.')
+  return response.json()
+}
