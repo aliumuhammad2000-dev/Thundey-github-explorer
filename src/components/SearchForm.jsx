@@ -1,10 +1,20 @@
 import { Search } from 'lucide-react'
-import { useState } from 'react'
+import { useDebounce } from '../hooks/useDebounce'
+import { useEffect, useRef, useState } from 'react'
 
 function SearchForm({ onSearch }) {
   const [query, setQuery] = useState('')
   const [searchType, setSearchType] = useState('users')
   const [error, setError] = useState('')
+  const debouncedQuery = useDebounce(query, 400)
+  const lastSubmittedQuery = useRef('')
+
+  useEffect(() => {
+    const trimmedQuery = debouncedQuery.trim()
+    if (trimmedQuery.length < 2 || trimmedQuery === lastSubmittedQuery.current) return
+    lastSubmittedQuery.current = trimmedQuery
+    onSearch({ query: trimmedQuery, type: searchType })
+  }, [debouncedQuery, onSearch, searchType])
 
   function handleSubmit(event) {
     event.preventDefault()
@@ -16,6 +26,7 @@ function SearchForm({ onSearch }) {
     }
 
     setError('')
+    lastSubmittedQuery.current = trimmedQuery
     onSearch({ query: trimmedQuery, type: searchType })
   }
 
@@ -33,7 +44,7 @@ function SearchForm({ onSearch }) {
           <input aria-describedby={error ? 'search-error' : undefined} aria-invalid={Boolean(error)} className="w-full rounded-xl border border-[#2d3a5c] bg-[#161d33] py-4 pl-12 pr-4 text-[#eef2ff] outline-none placeholder:text-[#7182ae] focus:border-[#f59e0b] focus:ring-2 focus:ring-[#f59e0b]/20" onChange={handleQueryChange} placeholder="Search GitHub users or repositories" type="search" value={query} />
         </label>
 
-        <select aria-label="Search type" className="rounded-xl border border-[#2d3a5c] bg-[#161d33] px-4 py-3 text-sm font-medium text-[#cbd5e1] outline-none focus:border-[#f59e0b] sm:w-36" onChange={(event) => setSearchType(event.target.value)} value={searchType}>
+        <select aria-label="Search type" className="rounded-xl border border-[#2d3a5c] bg-[#161d33] px-4 py-3 text-sm font-medium text-[#cbd5e1] outline-none focus:border-[#f59e0b] sm:w-36" onChange={(event) => { lastSubmittedQuery.current = ''; setSearchType(event.target.value) }} value={searchType}>
           <option value="users">Users</option>
           <option value="repositories">Repositories</option>
         </select>
