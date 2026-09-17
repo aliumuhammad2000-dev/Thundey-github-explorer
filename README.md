@@ -1,16 +1,49 @@
-# React + Vite
+# Thundey GitHub Explorer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Thundey GitHub Explorer is a responsive React application for discovering GitHub developers and repositories through the GitHub REST API.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Search GitHub users and repositories
+- Debounced search to reduce unnecessary API requests
+- Paginate through search results
+- Sort repositories by stars, forks, or recent updates
+- View detailed user profiles
+- Browse a user’s public repositories
+- Responsive layout for mobile and desktop screens
+- Loading skeletons for search, profile, and repository requests
+- Accessible labels, live status updates, and keyboard-friendly controls
+- Friendly handling for rate limits, missing resources, network failures, and empty results
 
-## React Compiler
+## Built With
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React
+- JavaScript
+- Tailwind CSS
+- Vite
+- Lucide React
+- GitHub REST API
 
-## Expanding the ESLint configuration
+## Learning Goal
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+My goal for this project was to learn how to integrate a live REST API into a frontend application. I learned how to make requests with `fetch`, encode search parameters, handle loading and error states, display API data in reusable React components, paginate results, sort response data, and handle common API edge cases such as rate limits and network failures.
+
+## API Notes
+
+The app reads public data from GitHub’s REST API. Search requests are made directly from the browser, so GitHub’s unauthenticated rate limits apply. No GitHub token is required for the current frontend-only version.
+
+## Live Demo
+
+
+
+## Project Structure
+
+```text
+src/
+├── api/                 # GitHub REST API request helpers
+├── components/          # Search form, result cards, profile, and loading UI
+├── hooks/               # Reusable React hooks
+├── App.jsx              # Main application state and layout
+└── main.jsx             # React entry point
+```
+
