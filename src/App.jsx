@@ -2,6 +2,7 @@ import { Code2 } from 'lucide-react'
 import { useState } from 'react'
 import { searchRepositories, searchUsers } from './api/github'
 import SearchForm from './components/SearchForm'
+import RepositoryResultCard from './components/RepositoryResultCard'
 import UserResultCard from './components/UserResultCard'
 
 function App() {
@@ -9,8 +10,10 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [hasSearched, setHasSearched] = useState(false)
+  const [searchType, setSearchType] = useState('users')
 
   async function handleSearch({ query, type }) {
+    setSearchType(type)
     setLoading(true)
     setError('')
     setHasSearched(true)
@@ -51,7 +54,7 @@ function App() {
               {loading && <p className="text-[#f59e0b]">Searching GitHub...</p>}
               {error && <p className="text-rose-300" role="alert">{error}</p>}
               {!loading && !error && results.length === 0 && <p className="text-[#a8b5d8]">No results found. Try another search.</p>}
-              {!loading && !error && results.length > 0 && <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{results.map((result) => <UserResultCard key={result.id} user={result} />)}</div>}
+              {!loading && !error && results.length > 0 && <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{results.map((result) => searchType === 'users' ? <UserResultCard key={result.id} user={result} /> : <RepositoryResultCard key={result.id} repository={result} />)}</div>}
             </section>
           )}
         </section>
